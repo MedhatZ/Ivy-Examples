@@ -81,21 +81,6 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
 
-      - name: Commit version tracking file
-        env:
-          TOKEN: ${{ secrets.GH_PAT }}
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          if [ -f ".github/last-ivy-version.txt" ]; then
-            git add .github/last-ivy-version.txt
-            if ! git diff --staged --quiet; then
-              git commit -m "Update last known Ivy version to ${{ needs.check-ivy-version.outputs.latest-version }}"
-              git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git HEAD:${GITHUB_REF#refs/heads/}
-            fi
-          fi
-
-
   discover-projects:
     name: Discover Projects
     runs-on: ubuntu-latest
