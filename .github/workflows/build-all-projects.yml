@@ -93,25 +93,22 @@ jobs:
           echo "version-changed=$version_changed" >> $GITHUB_OUTPUT
 
       - name: Commit version tracking file
-        if: steps.version-check.outputs.version-changed == 'true' || github.event_name != 'schedule'
-        run: |
-          # Configure git
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          # Check if there are changes to commit
-          if [ -f ".github/last-ivy-version.txt" ]; then
-            git add .github/last-ivy-version.txt
-            
-            # Only commit if there are actual changes
-            if ! git diff --staged --quiet; then
-              git commit -m "Update last known Ivy version to ${{ steps.version-check.outputs.latest-version }}"
-              git push
-              echo "✅ Updated version tracking file"
-            else
-              echo "ℹ️ No changes to version tracking file"
-            fi
-          fi
+     
+  if: steps.version-check.outputs.version-changed == 'true' || github.event_name != 'schedule'
+  run: |
+    git config --local user.email "action@github.com"
+    git config --local user.name "GitHub Action"
+    if [ -f ".github/last-ivy-version.txt" ]; then
+      git add .github/last-ivy-version.txt
+      if ! git diff --staged --quiet; then
+        git commit -m "Update last known Ivy version to ${{ steps.version-check.outputs.latest-version }}"
+        git push origin HEAD:${GITHUB_REF#refs/heads/}
+        echo "✅ Updated version tracking file"
+      else
+        echo "ℹ️ No changes to version tracking file"
+      fi
+    fi
+
 
   discover-projects:
     name: Discover Projects
