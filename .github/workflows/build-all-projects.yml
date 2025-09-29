@@ -226,8 +226,11 @@ jobs:
 
       - name: Set workflow status
         run: |
-          if [ "${{ needs.build-projects.result }}" != "success" ]; then
+          if [ "${{ needs.build-projects.result }}" == "failure" ]; then
+            echo "❌ Build workflow failed"
             exit 1
+          else
+            echo "✅ Build workflow succeeded (or skipped)"
           fi
 
   create-badge:
